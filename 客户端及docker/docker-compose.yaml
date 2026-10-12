@@ -1,0 +1,65 @@
+services:
+
+  dnf-1:
+    hostname: dnf-1
+    image: llnut/dnf:debian13-qf1031-latest
+    # Docker 29+ 默认 seccomp 策略会导致服务端创建 UDP socket 失败（Could not create a UDP socket : 38），
+    # 必须挂 v0.2.1 兼容 profile。见 README 常见问题第 21 条。
+    security_opt:
+      - seccomp=./seccomp-profile-v0.2.1.json
+    # privileged: true
+    # cap_add:
+    #   - NET_ADMIN
+    # tailscale必须配置devices
+    #devices:
+    #  - /dev/net/tun:/dev/net/tun
+    stop_grace_period: 30s
+    environment:
+      - TZ=Asia/Shanghai
+      - SERVER_GROUP=3
+      # 兼容GM工具使用cain数据库[也可以不配置，则会使用siroco数据库]
+      # - SERVER_GROUP_DB=cain
+      # 数据库root密码
+      - DNF_DB_ROOT_PASSWORD=88888888
+      # dnf-gate-server配置
+      - GATE_AES_KEY=a1b2c3d4e5f6789012345678901234567890abcdef0123456789abcdef012345
+      # TLS配置（可选，GATE_TLS_CERT_PATH与GATE_TLS_KEY_PATH同时设置时启用）
+      # - GATE_TLS_CERT_PATH=/data/server.crt
+      # - GATE_TLS_KEY_PATH=/data/server.key
+      # - GATE_TLS_BIND_ADDRESS=0.0.0.0:5504
+      # - GATE_TLS_ONLY=false
+      # 注册开关（可选，设为 false 时网关拒绝新用户注册）
+      # - GATE_REGISTRATION_OPEN=true
+      # 手动指定对外IP
+      - PUBLIC_IP=127.0.0.1
+      # 仅开启11和52频道
+      - OPEN_CHANNEL='11,52'
+      # Netbird[可选配置][没有公网IP的可选私有内网接入]
+      #- NB_SETUP_KEY=''
+      #- NB_MANAGEMENT_URL=''
+      # 开启DDNS[可选配置]
+      # - DDNS_ENABLE=true
+      # - DDNS_DOMAIN=''
+    # shm_size: 1g【不可删除】，docker默认为64M较小，需要增加才能保证运行
+    shm_size: 1g
+    memswap_limit: -1
+    mem_limit: 4g
+    cpus: '1.0'
+    restart: always
+    ports:
+      - 3000:4000/tcp             # mysql
+      - 5505:5505/tcp             # dnf-gate-server http
+      # - 5504:5504/tcp           # dnf-gate-server https（启用TLS后开放）
+      - 7001:7001/tcp             # df_channel_r
+      - 7001:7001/udp             # df_channel_r
+      - 7300:7300/tcp             # df_relay_r
+      - 7300:7300/udp             # df_relay_r
+      - 30011:30011/tcp           # df_game_r[ch.11]
+      - 31011:31011/udp           # df_game_r[ch.11]
+      - 30052:30052/tcp           # df_game_r[ch.52]
+      - 31052:31052/udp           # df_game_r[ch.52]
+      - 2311-2313:2311-2313/udp   # df_stun_r
+    volumes:
+      - ./data:/data
+      - ./mysql:/var/lib/mysql
+      - ./log:/home/neople/game/log

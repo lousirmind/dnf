@@ -1,0 +1,11 @@
+# ---- 单机部署：运行期数据与安装包，不入库 ----
+# 目录里只保留 docker-compose.yaml / seccomp-profile / sha256 这几个配置文件
+客户端及docker/data/
+客户端及docker/mysql/
+客户端及docker/log/
+客户端及docker/*.exe
+客户端及docker/*.7z
+客户端及docker/*.zip
+
+# ---- 启动器运行日志 ----
+tools/*.log

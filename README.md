@@ -13,6 +13,7 @@
 
 ## 部署前须知
 
+- **只想在 Windows 上自己单机玩**（服务端和客户端都在同一台电脑，不需要 Linux 服务器、不需要公网 IP）：直接看 [Windows 单机部署指南](doc/PrepareWindows.md)，从零到进游戏一步步都有。
 - 本项目使用 [llnut 登录器](https://github.com/llnut/dnf-login)，环境变量和端口与 1995chen 版本不同，请使用本仓库的配置文件部署。详细区别见[与 1995chen/dnf 的环境变量和端口区别](#vs-1995chen-dep)。
 - 若您需要从旧版本升级，请先阅读[从旧版本升级](#upgrade)。
 - Docker 29 及以上版本需要先[配置 Docker seccomp 兼容规则](doc/PrepareLinux.md#seccomp-profile)，并按照[常见问题中的说明](#qa-seccomp-profile)调整启动配置，否则服务端会启动失败。
@@ -26,11 +27,15 @@
 <a id="quick-start"></a>
 ## 快速开始
 
-### 第一步：准备 Linux 环境
+### 第一步：准备服务端环境
 
 参考以下指南完成服务器初始化。镜像支持 x86_64 架构的 Linux 系统。
 
 [初始化 Linux 服务器](doc/PrepareLinux.md)
+
+> 在 Windows 上跑单机版（服务端和客户端同一台机器）不需要 Linux 环境，请改看 [Windows 单机部署指南](doc/PrepareWindows.md)。
+>
+> 注意 Windows 单机部署**必须使用 Docker Desktop**，不能用 WSL2 里的原生 Docker —— WSL2 的 NAT 网络只转发 TCP，而本项目需要多个 UDP 端口。
 
 ### 第二步：启动服务端
 
